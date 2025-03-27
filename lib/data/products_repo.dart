@@ -17,6 +17,31 @@ class ProductsRepo {
         (singleProduct) => Product.fromJson(singleProduct));
   }
 
+  Future<List<String>> getCategories() async {
+    return _safeCall(() => _dio.get("products/categories"), 
+        (categoriesData) => (categoriesData as List)
+            .map((category) => category.toString())
+            .toList());
+  }
+
+  Future<List<Product>> getProductsByCategory(String category, {int limit = 10, int offset = 0}) async {
+    return _safeCall(() => _dio.get("products/category/$category"), (productsData) {
+      final allProducts = (productsData as List)
+          .map((item) => Product.fromJson(item))
+          .toList();
+      
+      //Paginazione
+      final end = offset + limit;
+      if (allProducts.isEmpty || offset >= allProducts.length) {
+        return <Product>[];
+      }
+      
+      return end > allProducts.length 
+          ? allProducts.sublist(offset) 
+          : allProducts.sublist(offset, end);
+    });
+  }
+
   Future<T> _safeCall<T>(Future<Response> Function() apiCall,
       T Function(dynamic data) onSuccess) async {
     try {
