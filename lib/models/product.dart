@@ -15,7 +15,7 @@ class Product {
     required this.category,
     required this.image,
     double? sharePrice,
-  }) : sharePrice = sharePrice ?? price / 100;
+  }) : sharePrice = (sharePrice ?? ((price / 100) * 100).ceil() / 100);
 
   Product copyWith({
     int? id,

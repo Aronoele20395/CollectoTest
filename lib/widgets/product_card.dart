@@ -1,4 +1,5 @@
 import 'package:collecto/models/product.dart';
+import 'package:collecto/widgets/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -9,50 +10,63 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       width: 250,
+      constraints: BoxConstraints(maxHeight: 350), //Imposta un'altezza massima
       child: Card(
+        clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
+          borderRadius: BorderRadius.circular(4),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(
-              product.image,
-              height: 150,
+            SizedBox(
+              height: 130,
               width: double.infinity,
-              fit: BoxFit.contain,
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    product.description,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Text('${product.price}€',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      Spacer(),
-                      Text('${product.sharePrice}€'),
-                    ],
-                  ),
-                ],
+              child: Image.network(
+                product.image,
+                fit: BoxFit.contain,
               ),
             ),
-            SizedBox(height: 10),
+
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                    
+                    SizedBox(height: 4),
+                    
+                    Text(
+                      product.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    
+                    Spacer(),
+                    
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(child: PriceWidget(amount: product.price, label: "Valore Totale")),
+                        SizedBox(width: 4),
+                        Flexible(child: PriceWidget(amount: product.sharePrice, label: "Prezzo quota")),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
             SizedBox(
               width: double.infinity,
               height: 40,
@@ -63,7 +77,10 @@ class ProductCard extends StatelessWidget {
                   foregroundColor: Colors.black,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(4),
+                      bottomRight: Radius.circular(4),
+                    ),
                   ),
                 ),
                 child: const Text(
