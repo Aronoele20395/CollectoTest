@@ -29,7 +29,6 @@ class ProductCard extends StatelessWidget {
                 fit: BoxFit.contain,
               ),
             ),
-
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(8.0),
@@ -40,33 +39,34 @@ class ProductCard extends StatelessWidget {
                       product.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
-                    
                     SizedBox(height: 4),
-                    
                     Text(
                       product.description,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 12),
                     ),
-                    
                     Spacer(),
-                    
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Flexible(child: PriceWidget(amount: product.price, label: "Valore Totale")),
+                        Flexible(
+                            child: PriceWidget(
+                                amount: product.price, label: "Valore Totale")),
                         SizedBox(width: 4),
-                        Flexible(child: PriceWidget(amount: product.sharePrice, label: "Prezzo quota")),
+                        Flexible(
+                            child: PriceWidget(
+                                amount: product.sharePrice,
+                                label: "Prezzo quota")),
                       ],
                     ),
                   ],
                 ),
               ),
             ),
-
             SizedBox(
               width: double.infinity,
               height: 40,
