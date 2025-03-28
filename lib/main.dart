@@ -1,6 +1,8 @@
 import 'package:collecto/controllers/products_controller.dart';
 import 'package:collecto/data/products_repo.dart';
 import 'package:collecto/pages/home_page.dart';
+import 'package:collecto/utils/routes.dart';
+import 'package:collecto/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -14,17 +16,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      initialRoute: '/',
+      getPages: navigationRoutes,
       title: 'Collecto',
-      theme: ThemeData(
-        primaryColor: Color(0xFF09EBB0),
-        appBarTheme: AppBarTheme(
-            centerTitle: true,
-            backgroundColor: Color(0xFF1C2C38)),
-        tabBarTheme: TabBarTheme(
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70
-        ),
-      ),
+      theme: collectoTheme,
       initialBinding: BindingsBuilder(() {
         Get.put(ProductsRepo());
         Get.put(ProductsController(Get.find()));
