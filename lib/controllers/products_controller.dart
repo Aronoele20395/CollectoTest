@@ -29,6 +29,9 @@ class ProductsController extends GetxController {
   int womenOffset = 0;
   int offset = 0;
 
+  //Query di ricerca
+  final RxString searchQuery = ''.obs;
+
   ProductsController(this._repo);
 
   @override
@@ -149,5 +152,38 @@ class ProductsController extends GetxController {
 
   List<Product> getAllProducts() {
     return all;
+  }
+
+
+//--------------------------------FUNZIONI PER LA RICERCA
+
+  void filterProductsByName(String query) {
+    searchQuery.value = query;
+  }
+  
+  List<Product> getFilteredProductsByCategory(String category) {
+    final List<Product> originalList = getProductsByCategory(category);
+    
+    //Se non c'è una ricerca, return lista originale
+    if (searchQuery.isEmpty) {
+      return originalList;
+    }
+    
+    //Altrimenti filtra la lista
+    final queryLower = searchQuery.value.toLowerCase();
+    return originalList.where(
+      (product) => product.title.toLowerCase().contains(queryLower)
+    ).toList();
+  }
+  
+  List<Product> getFilteredAllProducts() {
+    if (searchQuery.isEmpty) {
+      return all;
+    }
+    
+    final queryLower = searchQuery.value.toLowerCase();
+    return all.where(
+      (product) => product.title.toLowerCase().contains(queryLower)
+    ).toList();
   }
 }

@@ -27,12 +27,8 @@ class HomePage extends StatelessWidget {
           body: TabBarView(
             children: [
               NewProductsPage(),
-              Container(
-                color: Colors.red,
-              ),
-              Container(
-                color: Colors.green,
-              ),
+              Center(child: Text("Marketplace"),),
+              Center(child: Text("Beni Venduti"),)
             ],
           ),
           bottomNavigationBar: BottomNavigationBar(
