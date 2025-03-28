@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:collecto/models/product.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class ProductsRepo {
   static const String _baseUrl = "https://fakestoreapi.com/";
@@ -43,7 +44,6 @@ class ProductsRepo {
               .toList());
       _allProductsCache = fullList;
       _isAllProductsCached = true;
-      print("Cached all ${_allProductsCache.length} products");
     }
 
     //Paginazione dalla lista salvata in locale
@@ -56,7 +56,7 @@ class ProductsRepo {
         ? _allProductsCache.sublist(offset)
         : _allProductsCache.sublist(offset, end);
 
-    print(
+    debugPrint(
         "Carico ${paginatedResults.length} prodotti (offset: $offset, limit: $limit)");
     return paginatedResults;
   }
@@ -74,7 +74,7 @@ class ProductsRepo {
             .toList());
   }
 
-  Map<String, List<Product>> _categoryProductsCache = {};
+  final Map<String, List<Product>> _categoryProductsCache = {};
   
   Future<List<Product>> getProductsByCategory(String category,
       {int limit = 10, int offset = 0}) async {
@@ -99,7 +99,7 @@ class ProductsRepo {
         ? cachedProducts.sublist(offset)
         : cachedProducts.sublist(offset, end);
 
-    print(
+    debugPrint(
         "Carico ${paginatedResults.length} prodotti per la categoria $category (offset: $offset, limit: $limit)");
     return paginatedResults;
   }

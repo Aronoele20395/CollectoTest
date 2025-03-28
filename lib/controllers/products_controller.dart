@@ -1,5 +1,6 @@
 import 'package:collecto/data/products_repo.dart';
 import 'package:collecto/models/product.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 class ProductsController extends GetxController {
@@ -48,7 +49,7 @@ class ProductsController extends GetxController {
         loadMoreByCategory(null)
       ]);
     } catch (e) {
-      print("Errore nel caricamento dati: $e");
+      debugPrint("Errore nel caricamento dati: $e");
     } finally {
       isLoading.value = false;
     }
@@ -102,13 +103,13 @@ class ProductsController extends GetxController {
         isLoadingMore.value = true;
         final products =
             await _repo.getAllProducts(limit: perPage, offset: offset);
-        print("All products loaded: ${products.length}");
+        debugPrint("All products loaded: ${products.length}");
         all.addAll(products);
         offset += products.length;
         isLoadingMore.value = false;
       }
     } catch (e) {
-      print("Errore nel caricamento di $category: $e");
+      debugPrint("Errore nel caricamento di $category: $e");
       //Reset stato di caricamento in caso di errore
       if (category != null) {
         switch (category) {
