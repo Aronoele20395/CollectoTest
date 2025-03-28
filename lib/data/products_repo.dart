@@ -8,28 +8,16 @@ class ProductsRepo {
 
   ProductsRepo({Dio? dio}) : _dio = dio ?? Dio(BaseOptions(baseUrl: _baseUrl));
 
-  Future<List<Product>> getAllProducts() async {
-    return _safeCall(() => _dio.get("products"), (productsData) => List<Product>.from(productsData));
-  }
+//FakeStoreAPI non supporta l'offset per cui ho dovuto utilizzare un'alternativa che prevede il salvataggio di tutti i prodotti in una variabile locale da cui poi prelevare man mano quelli desiderati.
+//Non è una soluzione ottimale e non la utilizzerei in un contesto diverso da quello di un esercizio di test.
+//Lascio commentata qui sotto la soluzione che avrei utilizzato con la possibilità di utilizzare un parametro di offset nella chiamata (altrettanto vale per i prodotti suddivisi per categoria).
 
-  Future<Product> getSingleProduct(int id) async {
-    return _safeCall(() => _dio.get("products/$id"),
-        (singleProduct) => Product.fromJson(singleProduct));
-  }
-
-  Future<List<String>> getCategories() async {
-    return _safeCall(() => _dio.get("products/categories"), 
-        (categoriesData) => (categoriesData as List)
-            .map((category) => category.toString())
-            .toList());
-  }
-
-  Future<List<Product>> getProductsByCategory(String category, {int limit = 10, int offset = 0}) async {
-    return _safeCall(() => _dio.get("products/category/$category"), (productsData) {
+  /* Future<List<Product>> getAllProducts({int limit = 10, int offset = 0}) async {
+    return _safeCall(() => _dio.get("products"), (productsData) {
       final allProducts = (productsData as List)
           .map((item) => Product.fromJson(item))
           .toList();
-      
+
       //Paginazione
       final end = offset + limit;
       if (allProducts.isEmpty || offset >= allProducts.length) {
@@ -40,6 +28,80 @@ class ProductsRepo {
           ? allProducts.sublist(offset) 
           : allProducts.sublist(offset, end);
     });
+  } */
+
+  List<Product> _allProductsCache = [];
+  bool _isAllProductsCached = false;
+
+  Future<List<Product>> getAllProducts({int limit = 10, int offset = 0}) async {
+    if (!_isAllProductsCached) {
+      //Carico tutti i prodotti una sola volta
+      final fullList = await _safeCall(
+          () => _dio.get("products"),
+          (productsData) => (productsData as List)
+              .map((item) => Product.fromJson(item))
+              .toList());
+      _allProductsCache = fullList;
+      _isAllProductsCached = true;
+      print("Cached all ${_allProductsCache.length} products");
+    }
+
+    //Paginazione dalla lista salvata in locale
+    if (_allProductsCache.isEmpty || offset >= _allProductsCache.length) {
+      return <Product>[];
+    }
+
+    final end = offset + limit;
+    final paginatedResults = end > _allProductsCache.length
+        ? _allProductsCache.sublist(offset)
+        : _allProductsCache.sublist(offset, end);
+
+    print(
+        "Carico ${paginatedResults.length} prodotti (offset: $offset, limit: $limit)");
+    return paginatedResults;
+  }
+
+  Future<Product> getSingleProduct(int id) async {
+    return _safeCall(() => _dio.get("products/$id"),
+        (singleProduct) => Product.fromJson(singleProduct));
+  }
+
+  Future<List<String>> getCategories() async {
+    return _safeCall(
+        () => _dio.get("products/categories"),
+        (categoriesData) => (categoriesData as List)
+            .map((category) => category.toString())
+            .toList());
+  }
+
+  Map<String, List<Product>> _categoryProductsCache = {};
+  
+  Future<List<Product>> getProductsByCategory(String category,
+      {int limit = 10, int offset = 0}) async {
+    //controllo se i prodotti per questa categoria sono già in cache
+    if (!_categoryProductsCache.containsKey(category)) {
+      final fullList = await _safeCall(
+          () => _dio.get("products/category/$category"),
+          (productsData) => (productsData as List)
+              .map((item) => Product.fromJson(item))
+              .toList());
+      _categoryProductsCache[category] = fullList;
+    }
+
+    final cachedProducts = _categoryProductsCache[category] ?? [];
+
+    if (cachedProducts.isEmpty || offset >= cachedProducts.length) {
+      return <Product>[];
+    }
+
+    final end = offset + limit;
+    final paginatedResults = end > cachedProducts.length
+        ? cachedProducts.sublist(offset)
+        : cachedProducts.sublist(offset, end);
+
+    print(
+        "Carico ${paginatedResults.length} prodotti per la categoria $category (offset: $offset, limit: $limit)");
+    return paginatedResults;
   }
 
   Future<T> _safeCall<T>(Future<Response> Function() apiCall,
@@ -49,14 +111,7 @@ class ProductsRepo {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data["status"] == "success") {
-          return onSuccess(data["message"]);
-        } else {
-          throw DioException(
-            requestOptions: response.requestOptions,
-            error: "Invalid response: ${data["message"]}",
-          );
-        }
+        return onSuccess(data);
       } else {
         throw DioException(
           requestOptions: response.requestOptions,

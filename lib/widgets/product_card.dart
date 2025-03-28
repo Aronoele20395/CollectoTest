@@ -9,10 +9,12 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 250,
-      margin: EdgeInsets.symmetric(horizontal: 8.0),
       child: Card(
+        shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -20,7 +22,7 @@ class ProductCard extends StatelessWidget {
               product.image,
               height: 150,
               width: double.infinity,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             ),
             Padding(
               padding: EdgeInsets.all(8.0),
@@ -29,9 +31,15 @@ class ProductCard extends StatelessWidget {
                 children: [
                   Text(
                     product.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  Text(product.description, maxLines: 2, overflow: TextOverflow.ellipsis,),
+                  Text(
+                    product.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   SizedBox(height: 8),
                   Row(
                     children: [
@@ -41,19 +49,31 @@ class ProductCard extends StatelessWidget {
                       Text('${product.sharePrice}€'),
                     ],
                   ),
-                  SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(Get.theme.primaryColor),
-                    ),
-                    child: const Text(
-                      "Acquista ora",
-                      style: TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.w200),
-                    ),
-                  ),
                 ],
+              ),
+            ),
+            SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Get.theme.primaryColor,
+                  foregroundColor: Colors.black,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                child: const Text(
+                  "Acquista ora",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ),
           ],
